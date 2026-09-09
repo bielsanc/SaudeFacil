@@ -7,7 +7,7 @@ import {
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 
-import ImcHeader from '../components/Header';
+import Header from '../components/Header';
 import AguaOndas from '../components/AguaOndas';
 import AguaConsumo from '../components/AguaConsumo';
 import AguaPesoCard from '../components/AguaPesoCard';
@@ -40,7 +40,7 @@ export default function AguaScreen({ navigation }) {
 
       {/* Conteúdo sobreposto */}
       <View style={styles.content}>
-        <ImcHeader
+        <Header
           title="Água"
           icon={require('../../assets/agua.png')}
           variant="light"

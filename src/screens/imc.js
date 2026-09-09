@@ -7,7 +7,7 @@ import {
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 
-import ImcHeader from '../components/Header';
+import Header from '../components/Header';
 import ImcForm from '../components/ImcForm';
 import ImcChart from '../components/ImcImagem';
 import ImcResultCard from '../components/ImcResultado';
@@ -54,7 +54,7 @@ export default function ImcScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ImcHeader
+      <Header
         variant="orange"
         title={isResultado ? 'IMC · Resultado' : 'IMC'}
         icon={require('../../assets/imc.png')}
