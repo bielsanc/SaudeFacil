@@ -26,7 +26,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O SaúdeFácil acessa suas fotos para você definir a foto do seu perfil.",
+          "cameraPermission": "O SaúdeFácil acessa sua câmera para você tirar uma foto de perfil."
+        }
+      ]
     ]
   }
 }

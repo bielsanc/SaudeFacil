@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, SafeAreaView, Pressable, ActivityIndicator, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useFonts as usePoppins, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { useFonts as useLibreBaskerville, LibreBaskerville_700Bold } from '@expo-google-fonts/libre-baskerville';
 import Header from '../components/HeaderHome';
 import CategoryCard from '../components/Cards';
+import BottomNavBar from '../components/BottomNavBar';
 
 const categories = [
   { id: '1', title: 'Sangue', icon: require('../../assets/sangue.png') },
@@ -66,31 +66,12 @@ export default function HomeScreen({ navigation }) {
         </View>
       </ScrollView>
 
-      {/* Barra de navegação inferior */}
-      <View style={styles.bottomBar}>
-        <Pressable
-          style={({ pressed }) => [styles.navBtn, pressed && styles.pressed]}
-          onPress={() => console.log('Navegar para Home')}
-        >
-          <Ionicons name="home" size={24} color="#262A3B" />
-        </Pressable>
-
-        <Pressable
-          style={({ pressed }) => [styles.navBtn, pressed && styles.pressed]}
-          onPress={() => console.log('Adicionar item')}
-        >
-          <View style={styles.addBtn}>
-            <Ionicons name="add" size={26} color="#F7F5EC" />
-          </View>
-        </Pressable>
-
-        <Pressable
-          style={({ pressed }) => [styles.navBtn, pressed && styles.pressed]}
-          onPress={() => console.log('Navegar para Perfil')}
-        >
-          <Ionicons name="person" size={22} color="#262A3B" />
-        </Pressable>
-      </View>
+      <BottomNavBar
+        active="home"
+        onPressHome={() => console.log('Já está na Home')}
+        onPressAdd={() => console.log('Adicionar item')}
+        onPressProfile={() => navigation.navigate('Profile')}
+      />
     </SafeAreaView>
   );
 }
@@ -120,43 +101,5 @@ gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 25,
-    left: 20,
-    right: 20,
-    height: 65,
-    backgroundColor: '#EFECE1',
-    borderRadius: 35,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    elevation: 8,
-    shadowColor: '#1E2136',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    ...Platform.select({
-      web: {
-        boxShadow: '0px 8px 20px rgba(30, 33, 54, 0.15)',
-      },
-    }),
-  },
-  navBtn: {
-    padding: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#262A3B',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pressed: {
-    opacity: 0.5,
   },
 });
