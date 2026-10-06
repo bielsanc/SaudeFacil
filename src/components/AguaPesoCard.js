@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
+import Card from './Card';
 
 export default function AguaPesoCard({ peso, setPeso, meta }) {
   return (
-    <View style={styles.card}>
+    <Card variant="water" style={styles.card}>
       <Text style={styles.label}>Digite seu peso:</Text>
 
       <View style={styles.inputRow}>
@@ -19,24 +20,17 @@ export default function AguaPesoCard({ peso, setPeso, meta }) {
 
       <Text style={styles.label}>Você deve beber:</Text>
       <Text style={styles.meta}>{(Number.isFinite(meta) ? meta : 1200).toLocaleString('pt-BR')}ml</Text>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'rgba(234, 246, 252, 0.88)',
     marginHorizontal: 16,
-    borderRadius: 24,
     paddingVertical: 18,
     paddingHorizontal: 20,
     alignItems: 'center',
     zIndex: 7,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 5,
   },
   label: {
     fontSize: 14,

@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Button from './Button';
 
 /**
  * Modal reutilizável em formato de "bottom sheet" que sobe de baixo para cima.
@@ -82,8 +83,10 @@ export default function PhotoPickerSheet({
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>
 
-          <Pressable
-            style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
+          <Button
+            variant="listOption"
+            style={styles.option}
+            contentStyle={styles.optionContent}
             onPress={() => fechar(onTirarFoto)}
           >
             <View style={[styles.optionIcon, { backgroundColor: '#282B49' }]}>
@@ -94,10 +97,12 @@ export default function PhotoPickerSheet({
               <Text style={styles.optionHint}>Usar a câmera do aparelho</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color="#B3B7C2" />
-          </Pressable>
+          </Button>
 
-          <Pressable
-            style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
+          <Button
+            variant="listOption"
+            style={styles.option}
+            contentStyle={styles.optionContent}
             onPress={() => fechar(onEscolherGaleria)}
           >
             <View style={[styles.optionIcon, { backgroundColor: '#FF751F' }]}>
@@ -108,14 +113,15 @@ export default function PhotoPickerSheet({
               <Text style={styles.optionHint}>Selecionar uma foto existente</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color="#B3B7C2" />
-          </Pressable>
+          </Button>
 
-          <Pressable
-            style={({ pressed }) => [styles.cancelBtn, pressed && styles.optionPressed]}
+          <Button
+            variant="danger"
+            title="Cancelar"
+            textStyle={styles.cancelText}
+            style={styles.cancelBtn}
             onPress={() => fechar()}
-          >
-            <Text style={styles.cancelText}>Cancelar</Text>
-          </Pressable>
+          />
         </Animated.View>
       </View>
     </Modal>
@@ -167,17 +173,11 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F4F1EA',
-    borderRadius: 18,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    alignItems: 'stretch',
+    width: '100%',
     marginBottom: 10,
   },
-  optionPressed: {
-    opacity: 0.7,
-  },
+  optionContent: { width: '100%', justifyContent: 'flex-start' },
   optionIcon: {
     width: 40,
     height: 40,

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 const ITEM_HEIGHT = 10; // Espaçamento entre cada traço
@@ -6,9 +6,13 @@ const ITEM_HEIGHT = 10; // Espaçamento entre cada traço
 export default function HeightRuler({ min = 50, max = 220, value = 50, onChange }) {
   const scrollViewRef = useRef(null);
 
+  useEffect(() => {
+    const offset = Math.max(0, (value - min) * ITEM_HEIGHT);
+    scrollViewRef.current?.scrollTo({ y: offset, animated: true });
+  }, [value, min]);
+
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    // Calcula o valor com base na posição do scroll
     const calculatedValue = Math.round(offsetY / ITEM_HEIGHT) + min;
     
     if (calculatedValue >= min && calculatedValue <= max && calculatedValue !== value) {
@@ -30,8 +34,7 @@ export default function HeightRuler({ min = 50, max = 220, value = 50, onChange 
         showsVerticalScrollIndicator={false}
         snapToInterval={ITEM_HEIGHT}
         decelerationRate="fast"
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
+        onMomentumScrollEnd={handleScroll}
         contentContainerStyle={styles.scrollContent}
       >
         {Array.from({ length: max - min + 1 }, (_, i) => {
@@ -85,7 +88,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   scrollContent: {
-    paddingVertical: 140, // Espaçamento para o primeiro/último valor alinharem ao centro
+    paddingVertical: 145, // Espaçamento para o primeiro/último valor alinharem ao centro
   },
   tickRow: {
     flexDirection: 'row',

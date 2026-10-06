@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, SafeAreaView, View, ActivityIndicator, Text } from 'react-native';
 import {
   useFonts,
   Poppins_400Regular,
@@ -50,6 +50,13 @@ export default function AguaScreen({ navigation }) {
 
         <AguaConsumo consumido={consumido} />
 
+        {meta > 0 && progresso >= 1 && (
+          <View style={styles.congratulations}>
+            <Text style={styles.congratulationsTitle}>Parabéns!</Text>
+            <Text style={styles.congratulationsText}>Você atingiu sua meta. A foca está comemorando com você!</Text>
+          </View>
+        )}
+
         <View style={styles.bottomContainer}>
           <AguaPesoCard peso={peso} setPeso={setPeso} meta={meta} />
           <AguaQuickAdd onAdicionar={adicionarAgua} />
@@ -66,6 +73,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'space-between',
+    position: 'relative',
   },
   bottomContainer: {
     paddingBottom: 20,
@@ -76,4 +84,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#EAF6FC',
   },
+  congratulations: {
+    position: 'absolute', top: '28%', left: 8, right: 8, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 16,
+    borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', zIndex: 8,
+    shadowColor: '#0B3D66', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.14,
+    shadowRadius: 8, elevation: 4,
+  },
+  congratulationsTitle: { color: '#0B6FA0', fontSize: 17, fontFamily: 'Poppins_700Bold' },
+  congratulationsText: { color: '#315C76', fontSize: 11, fontFamily: 'Poppins_400Regular' },
 });

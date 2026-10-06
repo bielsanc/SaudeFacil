@@ -2,19 +2,18 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
-  Text,
   ScrollView,
   SafeAreaView,
-  Pressable,
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
-import ProfileHeader from '../components/ProfileHeader';
+import Header from '../components/Header';
+import ProfileIdentity from '../components/ProfileIdentity';
 import ProfileInfoCard from '../components/ProfileInfoCard';
 import BottomNavBar from '../components/BottomNavBar';
+import Button from '../components/Button';
 
 export default function ProfileScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -35,6 +34,11 @@ export default function ProfileScreen({ navigation }) {
     Alert.alert('Perfil atualizado', 'Suas informações foram salvas com sucesso.');
   };
 
+  const confirmarSair = () => Alert.alert('Sair da conta', 'Deseja realmente sair?', [
+    { text: 'Cancelar', style: 'cancel' },
+    { text: 'Sair', style: 'destructive', onPress: () => console.log('Logout') },
+  ]);
+
   if (!fontsLoaded) {
     return (
       <View style={styles.loading}>
@@ -46,8 +50,8 @@ export default function ProfileScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <ProfileHeader
-          onGoBack={() => navigation.goBack()}
+        <Header variant="profile" onGoBack={() => navigation.goBack()} onLogOut={confirmarSair} />
+        <ProfileIdentity
           photoUri={photoUri}
           onChangePhoto={setPhotoUri}
           name={nome}
@@ -65,26 +69,11 @@ export default function ProfileScreen({ navigation }) {
           ]}
         />
 
-        <Pressable
-          style={({ pressed }) => [styles.saveBtn, pressed && styles.saveBtnPressed]}
-          onPress={salvarAlteracoes}
-        >
-          <Ionicons name="checkmark-circle-outline" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />
-          <Text style={styles.saveText}>Salvar alterações</Text>
-        </Pressable>
+        <Button variant="dark" title="Salvar alterações" icon="checkmark-circle-outline" iconSize={18}
+          iconStyle={styles.buttonIcon} textStyle={styles.saveText} onPress={salvarAlteracoes} style={styles.saveBtn} />
 
-        <Pressable
-          style={({ pressed }) => [styles.logoutBtn, pressed && styles.pressed]}
-          onPress={() =>
-            Alert.alert('Sair da conta', 'Deseja realmente sair?', [
-              { text: 'Cancelar', style: 'cancel' },
-              { text: 'Sair', style: 'destructive', onPress: () => console.log('Logout') },
-            ])
-          }
-        >
-          <Ionicons name="log-out-outline" size={18} color="#D14343" style={{ marginRight: 8 }} />
-          <Text style={styles.logoutText}>Sair da conta</Text>
-        </Pressable>
+        <Button variant="danger" title="Sair da conta" icon="log-out-outline" iconSize={18} color="#D14343"
+          iconStyle={styles.buttonIcon} textStyle={styles.logoutText} onPress={confirmarSair} style={styles.logoutBtn} />
       </ScrollView>
 
       <BottomNavBar
@@ -112,43 +101,18 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   saveBtn: {
-    flexDirection: 'row',
-    backgroundColor: '#282B49',
     marginHorizontal: 20,
     marginTop: 18,
-    borderRadius: 30,
-    paddingVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#282B49',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 4,
   },
-  saveBtnPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  saveText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontFamily: 'Poppins_500Medium',
-  },
+  buttonIcon: { marginRight: 8 },
+  saveText: { color: '#FFFFFF', fontSize: 15, fontFamily: 'Poppins_500Medium' },
   logoutBtn: {
-    flexDirection: 'row',
     marginHorizontal: 20,
     marginTop: 14,
-    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoutText: {
-    color: '#D14343',
-    fontSize: 14,
-    fontFamily: 'Poppins_500Medium',
-  },
-  pressed: {
-    opacity: 0.6,
-  },
+  logoutText: { color: '#D14343', fontSize: 14, fontFamily: 'Poppins_500Medium' },
 });

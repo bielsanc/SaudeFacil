@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
+import Card from './Card';
 
 function Field({ label, value, onChangeText, keyboardType, isLast }) {
   return (
     <View style={[styles.field, !isLast && styles.fieldSpacing]}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputBox}>
+      <Card variant="soft" style={styles.inputBox}>
         <TextInput
           style={styles.input}
           value={value}
@@ -13,14 +14,14 @@ function Field({ label, value, onChangeText, keyboardType, isLast }) {
           keyboardType={keyboardType || 'default'}
           placeholderTextColor="#9A9FAE"
         />
-      </View>
+      </Card>
     </View>
   );
 }
 
 export default function ProfileInfoCard({ fields }) {
   return (
-    <View style={styles.card}>
+    <Card variant="profile" style={styles.card}>
       {fields.map((item, index) => (
         <Field
           key={item.label}
@@ -31,23 +32,16 @@ export default function ProfileInfoCard({ fields }) {
           isLast={index === fields.length - 1}
         />
       ))}
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
     marginHorizontal: 20,
     marginTop: 24,
-    borderRadius: 24,
     paddingVertical: 20,
     paddingHorizontal: 20,
-    shadowColor: '#1E2136',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
   },
   field: {
     alignItems: 'center',

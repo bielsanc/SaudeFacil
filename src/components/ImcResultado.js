@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Image, Animated, StyleSheet } from 'react-native';
 import { CATEGORIAS_IMC } from '../hooks/calculo';
+import Card from './Card';
 
 const PESSOA_ICONS = {
   magreza: require('../../assets/magreza.png'),
@@ -52,7 +53,7 @@ export default function ImcResultCard({ categoriaIndex }) {
   }
 
   return (
-    <View style={styles.card}>
+    <Card variant="result" style={styles.card}>
       <Text style={styles.title}>Categoria</Text>
       {CATEGORIAS_IMC.map((item, index) => (
         <LinhaCategoria
@@ -62,23 +63,16 @@ export default function ImcResultCard({ categoriaIndex }) {
           isCurrent={index === categoriaIndex}
         />
       ))}
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
     marginHorizontal: 16,
     marginTop: 14,
     marginBottom: 20,
-    borderRadius: 20,
     padding: 18,
-    shadowColor: '#1E2136',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
   },
   title: {
     fontSize: 17,

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { StyleSheet, SafeAreaView, ScrollView, View, ActivityIndicator, Animated, Pressable, Text } from 'react-native';
+import { StyleSheet, SafeAreaView, ScrollView, View, ActivityIndicator, Animated } from 'react-native';
 import {
   useFonts,
   Poppins_400Regular,
@@ -12,6 +12,7 @@ import ImcForm from '../components/ImcForm';
 import ImcChart from '../components/ImcImagem';
 import ImcResultCard from '../components/ImcResultado';
 import { useImcCalculator } from '../hooks/calculo';
+import Button from '../components/Button';
 
 export default function ImcScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -80,12 +81,7 @@ export default function ImcScreen({ navigation }) {
             <>
               <ImcChart categoriaIndex={resultado.categoriaIndex} imc={resultado.imc} />
               <ImcResultCard categoriaIndex={resultado.categoriaIndex} />
-              <Pressable
-                style={({ pressed }) => [styles.continueBtn, pressed && styles.continueBtnPressed]}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.continueText}>Continuar</Text>
-              </Pressable>
+              <Button title="Continuar" textStyle={styles.continueText} onPress={() => navigation.goBack()} style={styles.continueBtn} />
             </>
           )}
         </Animated.View>
@@ -110,9 +106,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#EBE7D9',
   },
   continueBtn: {
-    backgroundColor: '#FF751F',
-    borderRadius: 30,
-    paddingVertical: 16,
     alignItems: 'center',
     marginTop: 4,
     marginHorizontal: 16,
@@ -122,13 +115,5 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 4,
   },
-  continueBtnPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  continueText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontFamily: 'Poppins_700Bold',
-  },
+  continueText: { fontSize: 16 },
 });

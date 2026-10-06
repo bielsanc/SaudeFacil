@@ -11,8 +11,11 @@ export default function AguaConsumo({ consumido = 0 }) {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    top: 84,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    marginTop: -300,
     zIndex: 6,
   },
   valor: {

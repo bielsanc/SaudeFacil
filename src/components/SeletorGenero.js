@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Pressable, Image, Animated, StyleSheet } from 'react-native';
+import { View, Image, Animated, StyleSheet } from 'react-native';
+import Button from './Button';
 
 function GenderAvatar({ source, selected, onPress }) {
   const scale = useRef(new Animated.Value(selected ? 1 : 0.9)).current;
@@ -13,7 +14,7 @@ function GenderAvatar({ source, selected, onPress }) {
   }, [selected, scale]);
 
   return (
-    <Pressable onPress={onPress} hitSlop={6}>
+    <Button variant="select" onPress={onPress} style={styles.selectButton}>
       <Animated.View
         style={[
           styles.avatarWrap,
@@ -23,7 +24,7 @@ function GenderAvatar({ source, selected, onPress }) {
       >
         <Image source={source} style={styles.avatar} />
       </Animated.View>
-    </Pressable>
+    </Button>
   );
 }
 
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 20,
   },
+  selectButton: { padding: 0 },
   avatarWrap: {
     width: 76,
     height: 76,

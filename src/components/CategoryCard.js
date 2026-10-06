@@ -1,14 +1,14 @@
 import React from 'react';
-import { Pressable, Text, View, Image, StyleSheet, Platform } from 'react-native';
+import { Text, View, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Card from './Card';
 
 export default function CategoryCard({ title, icon, onPress }) {
   return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.card,
-        pressed && styles.cardPressed,
-      ]}
+    <Card
+      variant="category"
+      style={styles.card}
+      pressedStyle={styles.cardPressed}
       onPress={onPress}
     >
       <View style={styles.iconContainer}>
@@ -27,15 +27,13 @@ export default function CategoryCard({ title, icon, onPress }) {
       <View style={styles.arrowIcon}>
         <Ionicons name="chevron-forward" size={12} color="#8A8F9E" />
       </View>
-    </Pressable>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     width: '31%',
-    backgroundColor: '#EFECE1',
-    borderRadius: 20,
     paddingVertical: 10,
     paddingLeft: 5,
     paddingRight: 14, // Espaço reservado para a seta no canto
@@ -44,16 +42,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     position: 'relative',
     height: 70,
-    shadowColor: '#1E2136',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    ...Platform.select({
-      web: {
-        boxShadow: '0px 4px 12px rgba(30, 33, 54, 0.10)',
-      },
-    }),
   },
   cardPressed: {
     opacity: 0.8,

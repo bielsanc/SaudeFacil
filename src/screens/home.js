@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useFonts as usePoppins, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { useFonts as useLibreBaskerville, LibreBaskerville_700Bold } from '@expo-google-fonts/libre-baskerville';
-import Header from '../components/HeaderHome';
-import CategoryCard from '../components/Cards';
+import Header from '../components/Header';
+import CategoryCard from '../components/CategoryCard';
 import BottomNavBar from '../components/BottomNavBar';
 
 const categories = [
@@ -30,6 +30,8 @@ export default function HomeScreen({ navigation }) {
       navigation.navigate('IMC');
     } else if (title === 'Água') {
       navigation.navigate('Agua');
+    } else if (title === 'Sangue') {
+      navigation.navigate('Sangue');
     } else {
       console.log(`Card ${title} clicado`);
     }
@@ -47,6 +49,7 @@ export default function HomeScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Header
+          variant="home"
           userName="Bia"
           onOpenMenu={() => console.log('Menu aberto')}
           onOpenNotifications={() => console.log('Notificações abertas')}
@@ -103,3 +106,4 @@ gridContainer: {
     justifyContent: 'space-between',
   },
 });
+

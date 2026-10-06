@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Image, Animated, StyleSheet } from 'react-native';
+import { Text, Image, Animated, StyleSheet } from 'react-native';
+import Card from './Card';
 
 // Cada gráfico já vem com a "seta" (recorte) apontando para a fatia
 // correspondente do arco de categorias.
@@ -31,32 +32,25 @@ export default function ImcImagem({ categoriaIndex, imc }) {
   const grafico = GRAFICOS[categoriaIndex] || GRAFICOS[2];
 
   return (
-    <View style={styles.card}>
+    <Card variant="result" style={styles.card}>
       <Animated.View style={{ transform: [{ scale }], opacity }}>
         <Image source={grafico} style={styles.chartImage} />
       </Animated.View>
       <Text style={styles.chartTitle}>IMC</Text>
       <Text style={styles.chartSubtitle}>Seu IMC é:</Text>
       <Text style={styles.chartValue}>{imc}</Text>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   
   card: {
-    backgroundColor: '#FFFFFF',
     marginHorizontal: 16,
     marginTop: 20, // <- ADICIONE ESTA LINHA (Ajuste o valor para afastar do header)
-    borderRadius: 20,
     paddingTop: 8,
     paddingBottom: 20,
     alignItems: 'center',
-    shadowColor: '#1E2136',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
   },
  
   chartImage: {

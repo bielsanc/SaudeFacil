@@ -1,8 +1,10 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import GenderSelector from './SeletorGenero';
 import NumberWheelPicker from './RoletaIdadePeso';
 import HeightRuler from './RoletaAltura';
+import Card from './Card';
+import Button from './Button';
 
 export default function ImcForm({
   idade,
@@ -31,18 +33,17 @@ export default function ImcForm({
 
           {/* 2. SEÇÃO IDADE */}
           <Text style={styles.label}>Idade</Text>
-          <View style={styles.pickerCard}>
+          <NumericInput label="Idade" value={idade} suffix="anos" min={1} max={110} onChange={setIdade} />
+          <Card variant="surface" style={styles.pickerCard}>
             <NumberWheelPicker min={1} max={110} value={idade} onChange={setIdade} />
-          </View>
+          </Card>
 
           {/* 3. SEÇÃO PESO */}
-          <View style={styles.labelWithUnitRow}>
-            <Text style={styles.label}>Peso</Text>
-            <Text style={styles.unitInline}>kg</Text>
-          </View>
-          <View style={styles.pickerCard}>
+          <Text style={styles.label}>Peso</Text>
+          <NumericInput label="Peso" value={peso} suffix="kg" min={20} max={220} onChange={setPeso} />
+          <Card variant="surface" style={styles.pickerCard}>
             <NumberWheelPicker min={20} max={220} value={peso} onChange={setPeso} />
-          </View>
+          </Card>
 
         </View>
 
@@ -50,25 +51,64 @@ export default function ImcForm({
         <View style={styles.rightColumn}>
           <View style={styles.labelWithUnitRow}>
             <Text style={styles.label}>Altura</Text>
-            <Text style={styles.unitInline}>cm</Text>
           </View>
           
           {/* Card Branco da Altura (Ocupa toda a altura da coluna) */}
-          <View style={styles.heightRulerCard}>
+          <Card variant="surface" style={styles.heightRulerCard}>
+            <View pointerEvents="box-none" style={styles.heightInputOverlay}>
+              <NumericInput label="Altura" value={altura} suffix="cm" min={50} max={220} onChange={setAltura} />
+            </View>
+            <View style={styles.heightInputSpacer} />
             <HeightRuler min={50} max={220} value={altura} onChange={setAltura} />
-          </View>
+          </Card>
         </View>
 
       </View>
 
       {/* BOTÃO CONTINUAR */}
-      <Pressable
-        style={({ pressed }) => [styles.continueBtn, pressed && styles.continueBtnPressed]}
-        onPress={onContinuar}
-      >
-        <Text style={styles.continueText}>Continuar</Text>
-      </Pressable>
+      <Button title="Continuar" textStyle={styles.continueText} onPress={onContinuar} style={styles.continueBtn} />
     </View>
+  );
+}
+
+function NumericInput({ label, value, suffix, min, max, onChange }) {
+  const [text, setText] = useState(String(value ?? ''));
+  useEffect(() => setText(String(value ?? '')), [value]);
+
+  useEffect(() => {
+    const number = Number(text);
+    if (!text || number < min || number > max) return undefined;
+    const timer = setTimeout(() => onChange(number), 600);
+    return () => clearTimeout(timer);
+  }, [text, min, max, onChange]);
+
+  return (
+    <Card variant="input" style={styles.numericInputRow}>
+      <TextInput
+        style={styles.numericInput}
+        value={text}
+        onChangeText={(text) => {
+          if (!/^\d*$/.test(text)) return;
+          setText(text);
+        }}
+        onBlur={() => {
+          const parsed = Number(text);
+          const safeValue = Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : min;
+          onChange(safeValue);
+          setText(String(safeValue));
+        }}
+        onSubmitEditing={() => {
+          const parsed = Number(text);
+          const safeValue = Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : min;
+          onChange(safeValue);
+          setText(String(safeValue));
+        }}
+        keyboardType="number-pad"
+        accessibilityLabel={label}
+        selectTextOnFocus
+      />
+      {!!suffix && <Text style={styles.numericUnit}>{suffix}</Text>}
+    </Card>
   );
 }
 
@@ -110,34 +150,29 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   pickerCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     paddingVertical: 12,
     marginBottom: 12,
     alignItems: 'center',
-    shadowColor: '#1E2136',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
   },
+  numericInputRow: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 8,
+    paddingHorizontal: 14, marginBottom: 8, height: 58, width: '100%', minWidth: 0, maxWidth: '100%',
+  },
+  numericInput: { flex: 1, width: 0, minWidth: 0, paddingVertical: 0, fontSize: 16, color: '#262A3B', fontFamily: 'Poppins_500Medium', outlineStyle: 'none' },
+  numericUnit: { flexShrink: 0, marginLeft: 8, fontSize: 12, color: '#8E8E93', fontFamily: 'Poppins_500Medium' },
   heightRulerCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     flex: 1, // Faz o card da régua preencher toda a altura disponível da coluna
+    width: '100%',
+    minWidth: 0,
+    alignSelf: 'stretch',
+    position: 'relative',
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#1E2136',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
   },
+  heightInputOverlay: { position: 'absolute', top: 12, left: 12, right: 12, zIndex: 20 },
+  heightInputSpacer: { width: '100%', height: 66 },
   continueBtn: {
-    backgroundColor: '#FF751F',
-    borderRadius: 30,
-    paddingVertical: 16,
     alignItems: 'center',
     marginTop: 16,
     marginHorizontal: 10,
@@ -147,13 +182,5 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 4,
   },
-  continueBtnPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  continueText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontFamily: 'Poppins_700Bold',
-  },
+  continueText: { fontSize: 16 },
 });
