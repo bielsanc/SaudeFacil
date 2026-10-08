@@ -52,7 +52,7 @@ export default function Header({
 
   const palette = PALETTES[variant] || PALETTES.orange;
   return (
-    <View style={[styles.header, { backgroundColor: palette.bg }]}>
+    <View style={[styles.header, variant === 'blood' && styles.bloodHeader, { backgroundColor: palette.bg }]}>
       <Button variant="headerBack" onPress={onGoBack} icon={leftIcon === 'home' ? 'home' : 'chevron-back'}
         iconSize={24} color={palette.icon} style={styles.backBtn} />
       <View style={styles.headerTitleContainer}>
@@ -82,11 +82,12 @@ const PALETTES = {
 
 const styles = StyleSheet.create({
   header: { height: 84, borderBottomLeftRadius: 26, borderBottomRightRadius: 26, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, position: 'relative' },
+  bloodHeader: { height: 62, borderBottomLeftRadius: 22, borderBottomRightRadius: 22 },
   backBtn: { position: 'absolute', left: 16 },
   headerTitleContainer: { flexDirection: 'row', alignItems: 'center' },
   iconBadge: { width: 32, height: 32, borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginRight: 10, overflow: 'hidden' },
   headerIcon: { width: 50, height: 50, resizeMode: 'contain' },
-  headerTitle: { fontSize: 19, fontFamily: 'Poppins_700Bold' },
+  headerTitle: { fontSize: 18, fontFamily: 'Poppins_700Bold' },
   homeWrapper: { backgroundColor: 'transparent', overflow: 'visible' },
   homeBackground: { paddingHorizontal: 20, paddingTop: 48, paddingBottom: 40, position: 'relative' },
   homeBackgroundImage: { width: '100%', height: '100%', resizeMode: 'cover' },
