@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Image, Linking, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -12,9 +12,8 @@ const COMMONS_API = 'https://commons.wikimedia.org/w/api.php';
 const FRUIT_API_URL = Platform.OS === 'web'
   ? (process.env.EXPO_PUBLIC_FRUIT_API_PROXY || 'http://localhost:3001/api/fruit')
   : FRUIT_API;
-const TRANSLATION_API_URL = Platform.OS === 'web'
-  ? (process.env.EXPO_PUBLIC_TRANSLATION_API_PROXY || 'http://localhost:3001/api/translate')
-  : 'https://api.mymemory.translated.net/get';
+const DEEPL_BATCH_API_URL = process.env.EXPO_PUBLIC_TRANSLATION_API_PROXY
+  || 'http://localhost:3001/api/translate/batch';
 const FRUIT_CATALOG = [
   { apiName: 'Apple', portugueseName: 'Maçã', aliases: ['apple', 'maçã', 'maca'] },
   { apiName: 'Apricot', portugueseName: 'Damasco', aliases: ['apricot', 'damasco'] },
@@ -30,7 +29,7 @@ const FRUIT_CATALOG = [
   { apiName: 'Fig', portugueseName: 'Figo', aliases: ['fig', 'figo'] },
   { apiName: 'Gooseberry', portugueseName: 'Groselha', aliases: ['gooseberry', 'groselha'] },
   { apiName: 'Grape', portugueseName: 'Uva', aliases: ['grape', 'grapes', 'uva', 'uvas'] },
-  { apiName: 'GreenApple', portugueseName: 'Maçã verde', aliases: ['greenapple', 'green apple', 'maçã verde', 'maca verde'] },
+  { apiName: 'GreenApple', englishName: 'Green Apple', portugueseName: 'Maçã verde', aliases: ['greenapple', 'green apple', 'maçã verde', 'maca verde'] },
   { apiName: 'Guava', portugueseName: 'Goiaba', aliases: ['guava', 'goiaba'] },
   { apiName: 'Kiwi', portugueseName: 'Kiwi', aliases: ['kiwi'] },
   { apiName: 'Lemon', portugueseName: 'Limão siciliano', aliases: ['lemon', 'limão', 'limao', 'limão siciliano', 'limao siciliano'] },
@@ -60,6 +59,7 @@ const FRUIT_BY_ALIAS = Object.fromEntries(
 const FRUIT_BY_API_NAME = Object.fromEntries(
   FRUIT_CATALOG.map((fruit) => [normalizeFruitName(fruit.apiName), fruit]),
 );
+let fruitTranslationsRequest;
 
 export default function FruitScreen({ navigation }) {
   const [query, setQuery] = useState('');
@@ -68,6 +68,7 @@ export default function FruitScreen({ navigation }) {
   const [imageLoading, setImageLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
+  const [deepLNames, setDeepLNames] = useState({});
   const latestRequest = useRef(0);
   const { width } = useWindowDimensions();
   const [fontsLoaded] = useFonts({
@@ -75,6 +76,20 @@ export default function FruitScreen({ navigation }) {
     Poppins_500Medium,
     Poppins_700Bold,
   });
+
+  useEffect(() => {
+    let active = true;
+    requestFruitTranslations()
+      .then((translations) => {
+        if (active) setDeepLNames(translations);
+      })
+      .catch(() => {
+        // O catálogo em português continua disponível se a chave DeepL não estiver configurada.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   if (!fontsLoaded) {
     return (
@@ -96,7 +111,8 @@ export default function FruitScreen({ navigation }) {
     const requestId = latestRequest.current + 1;
     latestRequest.current = requestId;
     const normalizedName = normalizeFruitName(typedName);
-    const knownFruit = FRUIT_BY_ALIAS[normalizedName];
+    const knownFruit = FRUIT_BY_ALIAS[normalizedName]
+      || FRUIT_CATALOG.find((item) => normalizeFruitName(deepLNames[normalizeFruitName(item.apiName)]) === normalizedName);
 
     setSearching(true);
     setFruit(null);
@@ -105,15 +121,7 @@ export default function FruitScreen({ navigation }) {
     setSearchError('');
 
     try {
-      let apiName = knownFruit?.apiName;
-      if (!apiName) {
-        try {
-          apiName = (await translateFruitName(typedName, 'pt', 'en')).trim();
-        } catch {
-          // Permite tentar o termo digitado quando a tradução estiver indisponível.
-          apiName = typedName;
-        }
-      }
+      const apiName = knownFruit?.apiName || typedName;
 
       const response = await axios.get(`${FRUIT_API_URL}/${encodeURIComponent(apiName)}`, {
         timeout: 12000,
@@ -123,7 +131,7 @@ export default function FruitScreen({ navigation }) {
       // A busca é digitada em português; preserve esse nome para evitar traduções
       // incorretas de nomes próprios de frutas feitas pelo serviço de tradução.
       const displayFruit = FRUIT_BY_API_NAME[normalizeFruitName(response.data.name)] || knownFruit;
-      const displayName = displayFruit?.portugueseName || typedName;
+      const displayName = deepLNames[normalizeFruitName(response.data.name)] || displayFruit?.portugueseName || typedName;
       setFruit({ ...response.data, displayName });
       setSearching(false);
       setImageLoading(true);
@@ -379,18 +387,27 @@ async function searchFruitImage(fruitName) {
   };
 }
 
-async function translateFruitName(text, from, to) {
-  const response = await axios.get(TRANSLATION_API_URL, {
-    params: Platform.OS === 'web'
-      ? { text, from, to }
-      : { q: text, langpair: `${from}|${to}` },
-    timeout: 10000,
-  });
-  const translatedText = response.data?.responseData?.translatedText?.trim();
-  if (Number(response.data?.responseStatus) !== 200 || !translatedText) {
-    throw new Error('Translation API did not return a translation');
+function requestFruitTranslations() {
+  if (!fruitTranslationsRequest) {
+    fruitTranslationsRequest = axios.post(DEEPL_BATCH_API_URL, {
+      texts: FRUIT_CATALOG.map((fruit) => fruit.englishName || fruit.apiName.replace(/([a-z])([A-Z])/g, '$1 $2')),
+    }, { timeout: 15000 })
+      .then((response) => {
+        const translations = response.data?.translations;
+        if (!Array.isArray(translations) || translations.length !== FRUIT_CATALOG.length) {
+          throw new Error('DeepL returned an incomplete fruit catalog');
+        }
+        return Object.fromEntries(FRUIT_CATALOG.map((fruit, index) => [
+          normalizeFruitName(fruit.apiName),
+          translations[index]?.text?.trim() || fruit.portugueseName,
+        ]));
+      })
+      .catch((error) => {
+        fruitTranslationsRequest = null;
+        throw error;
+      });
   }
-  return translatedText;
+  return fruitTranslationsRequest;
 }
 
 function normalizeFruitName(value = '') {
