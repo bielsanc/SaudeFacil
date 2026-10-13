@@ -4,10 +4,10 @@
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "start": "node scripts/start-dev.js",
+    "android": "node scripts/start-dev.js --android",
+    "ios": "node scripts/start-dev.js --ios",
+    "web": "node scripts/start-dev.js --web"
   },
   "dependencies": {
     "@expo-google-fonts/libre-baskerville": "^0.4.3",

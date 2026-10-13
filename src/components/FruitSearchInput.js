@@ -1,14 +1,23 @@
 import React from 'react';
-import { Platform, StyleSheet, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function FruitSearchInput({ value, onChangeText, placeholder = 'Digite o nome da fruta...' }) {
+export default function FruitSearchInput({ value, onChangeText, onSubmitEditing, onSearch, placeholder = 'Digite o nome da fruta...' }) {
   return (
     <View style={styles.container}>
-      <Ionicons name="search" size={20} color="#0755B8" style={styles.icon} />
+      <Pressable
+        onPress={onSearch}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel="Buscar fruta"
+        style={styles.searchButton}
+      >
+        <Ionicons name="search" size={20} color="#0755B8" />
+      </Pressable>
       <TextInput
         value={value}
         onChangeText={onChangeText}
+        onSubmitEditing={onSubmitEditing}
         placeholder={placeholder}
         placeholderTextColor="#7390B5"
         style={styles.input}
@@ -30,7 +39,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E7F0FB',
     paddingHorizontal: 12,
   },
-  icon: { marginRight: 9 },
+  searchButton: { marginRight: 9, justifyContent: 'center', alignItems: 'center' },
   input: {
     flex: 1,
     minWidth: 0,
