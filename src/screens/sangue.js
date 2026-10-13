@@ -125,9 +125,6 @@ export default function SangueScreen({ navigation }) {
 
           <Card variant="profile" style={styles.compatibilityPanel}>
             <View style={styles.panelHeading}>
-              <View style={styles.panelHeadingIcon}>
-                <Ionicons name="people" size={22} color="#0E3D27" />
-              </View>
               <View style={styles.panelHeadingCopy}>
                 <Text style={styles.panelTitle}>Compatibilidades</Text>
                 <Text style={styles.panelSubtitle}>Veja quem pode doar pra você e pra quem você pode doar.</Text>
@@ -177,9 +174,7 @@ export default function SangueScreen({ navigation }) {
               style={({ pressed }) => [styles.donationButton, pressed && styles.donationButtonPressed]}
               accessibilityRole="button"
             >
-              <Ionicons name="location-sharp" size={20} color="#FFFFFF" />
               <Text style={styles.donationButtonText}>Encontre um local para doar</Text>
-              <Ionicons name="arrow-forward" size={21} color="#FFFFFF" />
             </Pressable>
           </Card>
         </ScrollView>
@@ -245,7 +240,7 @@ const styles = StyleSheet.create({
     paddingBottom: 22,
   },
   hero: {
-    minHeight: 138,
+    minHeight: 168,
     marginHorizontal: 0,
     justifyContent: 'center',
     position: 'relative',
@@ -284,14 +279,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_700Bold',
   },
   compatibilityPanel: {
-    marginHorizontal: 24,
+    marginHorizontal: 28,
     marginTop: -1,
-    paddingHorizontal: 12,
-    paddingTop: 14,
-    paddingBottom: 12,
-    borderRadius: 17,
-    minHeight: 252,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 14,
+    paddingTop: 18,
+    paddingBottom: 14,
+    borderRadius: 20,
+    minHeight: 302,
+    backgroundColor: 'rgba(255,255,255,0.76)',
     shadowColor: '#2A201C',
     shadowOpacity: 0.12,
     shadowRadius: 14,
@@ -301,17 +296,7 @@ const styles = StyleSheet.create({
   panelHeading: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  panelHeadingIcon: {
-    width: 31,
-    height: 31,
-    borderRadius: 16,
-    backgroundColor: '#EEF4EE',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8,
-    marginTop: 1,
+    marginBottom: 20,
   },
   panelHeadingCopy: {
     flex: 1,
@@ -334,21 +319,21 @@ const styles = StyleSheet.create({
   },
   compatibilityRow: {
     flexDirection: 'row',
-    gap: 9,
+    gap: 12,
   },
   compatibilityCard: {
     flex: 1,
-    minHeight: 168,
+    height: 202,
     padding: 8,
     borderRadius: 16,
     borderWidth: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
   },
   receiveCard: {
-    borderColor: '#CBDAC7',
+    borderColor: '#BDBDBD',
   },
   donateCard: {
-    borderColor: '#F1D9CD',
+    borderColor: '#BDBDBD',
   },
   groupHeading: {
     flexDirection: 'row',
@@ -371,8 +356,8 @@ const styles = StyleSheet.create({
   },
   groupTitle: {
     color: '#111111',
-    fontSize: 10.2,
-    lineHeight: 13,
+    fontSize: 8.4,
+    lineHeight: 11,
     fontFamily: 'Poppins_700Bold',
     flex: 1,
   },
@@ -461,13 +446,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_500Medium',
   },
   donationCard: {
-    marginHorizontal: 24,
-    marginTop: 13,
-    paddingHorizontal: 13,
-    paddingTop: 13,
+    marginHorizontal: 28,
+    marginTop: 16,
+    paddingHorizontal: 14,
+    paddingTop: 14,
     paddingBottom: 11,
-    borderRadius: 17,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.76)',
     shadowColor: '#2A201C',
     shadowOpacity: 0.1,
     shadowRadius: 13,
@@ -505,8 +490,8 @@ const styles = StyleSheet.create({
   },
   donationButton: {
     width: '100%',
-    height: 36,
-    borderRadius: 18,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: '#D90808',
     flexDirection: 'row',
     alignItems: 'center',
@@ -519,10 +504,10 @@ const styles = StyleSheet.create({
   },
   donationButtonText: {
     color: '#FFFFFF',
-    fontSize: 9.7,
+    fontSize: 10.5,
     fontFamily: 'Poppins_700Bold',
-    marginHorizontal: 8,
     flexShrink: 1,
+    textAlign: 'center',
   },
   modalBackdrop: {
     flex: 1,

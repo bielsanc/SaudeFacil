@@ -32,6 +32,8 @@ export default function HomeScreen({ navigation }) {
       navigation.navigate('Agua');
     } else if (title === 'Sangue') {
       navigation.navigate('Sangue');
+    } else if (title === 'Fruta') {
+      navigation.navigate('Fruta');
     } else {
       console.log(`Card ${title} clicado`);
     }
