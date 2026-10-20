@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Alert,
+  Platform,
 } from 'react-native';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
@@ -14,6 +15,8 @@ import ProfileIdentity from '../components/ProfileIdentity';
 import ProfileInfoCard from '../components/ProfileInfoCard';
 import BottomNavBar from '../components/BottomNavBar';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
+import { calcularIdade, paraNumero } from '../utils/validacao';
 
 export default function ProfileScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -22,22 +25,48 @@ export default function ProfileScreen({ navigation }) {
     Poppins_700Bold,
   });
 
-  const [photoUri, setPhotoUri] = useState(null);
-  const [nome, setNome] = useState('Beatriz Florencio');
-  const [email, setEmail] = useState('beatrizsantos.97@gmail.com');
-  const [idade, setIdade] = useState('17 anos');
-  const [tipoSanguineo, setTipoSanguineo] = useState('B+');
-  const [altura, setAltura] = useState('1,65cm');
-  const [peso, setPeso] = useState('60kg');
+  // Dados do usuário logado, salvos localmente no cadastro.
+  const { user, signOut, updateUser } = useAuth();
 
-  const salvarAlteracoes = () => {
+  // Estados editáveis, iniciados com o que está salvo.
+  const [photoUri, setPhotoUri] = useState(user.fotoUri || null);
+  const [nome, setNome] = useState(user.nome);
+  const [email] = useState(user.email); // e-mail é o identificador da conta, não editável
+  const [tipoSanguineo, setTipoSanguineo] = useState(user.tipoSanguineo);
+  const [altura, setAltura] = useState(`${user.altura}cm`);
+  const [peso, setPeso] = useState(`${user.peso}kg`);
+  // A idade é calculada a partir da data de nascimento (não é salva).
+  const idade = `${calcularIdade(user.nascimento) ?? '-'} anos`;
+
+  /** Extrai o número de textos como "60kg" ou "1,65cm". */
+  const extrairNumero = (t) => paraNumero(String(t).replace(/[^\d.,]/g, ''));
+
+  const salvarAlteracoes = async () => {
+    const pesoNum = extrairNumero(peso);
+    let alturaNum = extrairNumero(altura);
+    if (alturaNum > 0 && alturaNum < 3) alturaNum *= 100; // "1,65" -> 165 cm
+    if (!nome.trim() || !(pesoNum > 0) || !(alturaNum > 0)) {
+      return Alert.alert('Dados inválidos', 'Confira nome, peso e altura.');
+    }
+    await updateUser({
+      nome: nome.trim(), tipoSanguineo: tipoSanguineo.trim().toUpperCase(),
+      peso: pesoNum, altura: Math.round(alturaNum), fotoUri: photoUri,
+    });
     Alert.alert('Perfil atualizado', 'Suas informações foram salvas com sucesso.');
   };
 
-  const confirmarSair = () => Alert.alert('Sair da conta', 'Deseja realmente sair?', [
-    { text: 'Cancelar', style: 'cancel' },
-    { text: 'Sair', style: 'destructive', onPress: () => console.log('Logout') },
-  ]);
+  // Ao confirmar, encerra a sessão: o AppRouter volta sozinho para a tela de Login.
+  const confirmarSair = () => {
+    // Alert.alert não funciona no navegador, então usamos window.confirm na web.
+    if (Platform.OS === 'web') {
+      if (window.confirm('Deseja realmente sair?')) signOut();
+      return;
+    }
+    Alert.alert('Sair da conta', 'Deseja realmente sair?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Sair', style: 'destructive', onPress: signOut },
+    ]);
+  };
 
   if (!fontsLoaded) {
     return (
@@ -57,12 +86,12 @@ export default function ProfileScreen({ navigation }) {
           name={nome}
           setName={setNome}
           email={email}
-          setEmail={setEmail}
+          emailEditable={false}
         />
 
         <ProfileInfoCard
           fields={[
-            { label: 'Idade:', value: idade, onChangeText: setIdade },
+            { label: 'Idade:', value: idade, onChangeText: () => {} },
             { label: 'Tipo Sanguíneo:', value: tipoSanguineo, onChangeText: setTipoSanguineo },
             { label: 'Altura:', value: altura, onChangeText: setAltura, keyboardType: 'default' },
             { label: 'Peso:', value: peso, onChangeText: setPeso, keyboardType: 'default' },

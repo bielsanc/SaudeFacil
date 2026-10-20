@@ -7,7 +7,7 @@ import Button from './Button';
 const PLACEHOLDER_AVATAR = require('../../assets/pessoaIcon.png');
 const AVATAR_SIZE = 128;
 
-export default function ProfileIdentity({ photoUri, onChangePhoto, name, setName, email, setEmail }) {
+export default function ProfileIdentity({ photoUri, onChangePhoto, name, setName, email, setEmail, emailEditable = true }) {
   const [sheetVisible, setSheetVisible] = useState(false);
 
   const tirarFoto = async () => {
@@ -35,7 +35,7 @@ export default function ProfileIdentity({ photoUri, onChangePhoto, name, setName
 
       <View style={styles.identityBlock}>
         <TextInput style={styles.nameInput} value={name} onChangeText={setName} placeholder="Seu nome" placeholderTextColor="#9A9FAE" textAlign="center" />
-        <TextInput style={styles.emailInput} value={email} onChangeText={setEmail} placeholder="seuemail@exemplo.com" placeholderTextColor="#B3B7C2" keyboardType="email-address" autoCapitalize="none" textAlign="center" />
+        <TextInput style={styles.emailInput} value={email} onChangeText={setEmail} editable={emailEditable} placeholder="seuemail@exemplo.com" placeholderTextColor="#B3B7C2" keyboardType="email-address" autoCapitalize="none" textAlign="center" />
       </View>
 
       <PhotoPickerSheet visible={sheetVisible} onClose={() => setSheetVisible(false)} onTirarFoto={tirarFoto} onEscolherGaleria={escolherGaleria} />

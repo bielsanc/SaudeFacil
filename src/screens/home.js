@@ -3,6 +3,7 @@ import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator } from 'r
 import { useFonts as usePoppins, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { useFonts as useLibreBaskerville, LibreBaskerville_700Bold } from '@expo-google-fonts/libre-baskerville';
 import Header from '../components/Header';
+import { useAuth } from '../context/AuthContext';
 import CategoryCard from '../components/CategoryCard';
 import BottomNavBar from '../components/BottomNavBar';
 
@@ -22,6 +23,7 @@ const categories = [
 ];
 
 export default function HomeScreen({ navigation }) {
+  const { user } = useAuth(); // usuário logado (para exibir o nome no cabeçalho)
   const [poppinsLoaded] = usePoppins({ Poppins_400Regular, Poppins_500Medium });
   const [libreLoaded] = useLibreBaskerville({ LibreBaskerville_700Bold });
 
@@ -52,7 +54,7 @@ export default function HomeScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Header
           variant="home"
-          userName="Bia"
+          userName={user.nome.split(' ')[0]}
           onOpenMenu={() => console.log('Menu aberto')}
           onOpenNotifications={() => console.log('Notificações abertas')}
         />
