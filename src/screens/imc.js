@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { StyleSheet, SafeAreaView, ScrollView, View, ActivityIndicator, Animated } from 'react-native';
+import { StyleSheet, SafeAreaView, ScrollView, View, ActivityIndicator, Animated, Alert } from 'react-native';
 import {
   useFonts,
   Poppins_400Regular,
@@ -13,6 +13,10 @@ import ImcChart from '../components/ImcImagem';
 import ImcResultCard from '../components/ImcResultado';
 import { useImcCalculator } from '../hooks/calculo';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
+import { salvarRegistroImc } from '../services/authStorage';
+import { calcularIdade } from '../utils/validacao';
+import { CATEGORIAS_IMC } from '../hooks/calculo';
 
 export default function ImcScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -23,6 +27,7 @@ export default function ImcScreen({ navigation }) {
 
   const [step, setStep] = useState('form'); // 'form' | 'resultado'
   const fade = useRef(new Animated.Value(1)).current;
+  const { user } = useAuth();
 
   const {
     idade,
@@ -35,6 +40,14 @@ export default function ImcScreen({ navigation }) {
     setGenero,
     resultado,
   } = useImcCalculator();
+
+  React.useEffect(() => {
+    if (!user) return;
+    const idadeCadastro = calcularIdade(user.nascimento);
+    if (idadeCadastro != null) setIdade(idadeCadastro);
+    if (user.altura) setAltura(Number(user.altura));
+    if (user.peso) setPeso(Number(user.peso));
+  }, [user?.id]);
 
   const trocarStep = (novoStep) => {
     Animated.timing(fade, { toValue: 0, duration: 160, useNativeDriver: true }).start(() => {
@@ -52,6 +65,16 @@ export default function ImcScreen({ navigation }) {
   }
 
   const isResultado = step === 'resultado';
+  const continuar = async () => {
+    const categoria = CATEGORIAS_IMC[resultado.categoriaIndex]?.label;
+    if (!resultado.imc || !categoria) return;
+    try {
+      await salvarRegistroImc({ idade, genero, peso: Number(peso), altura: Number(altura), imc: Number(resultado.imc), categoria });
+      trocarStep('resultado');
+    } catch (error) {
+      Alert.alert('Não foi possível salvar', 'Verifique se a API e o banco MySQL do XAMPP estão ativos e tente novamente.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -75,7 +98,7 @@ export default function ImcScreen({ navigation }) {
               setPeso={setPeso}
               genero={genero}
               setGenero={setGenero}
-              onContinuar={() => trocarStep('resultado')}
+              onContinuar={continuar}
             />
           ) : (
             <>

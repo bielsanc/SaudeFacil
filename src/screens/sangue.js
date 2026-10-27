@@ -8,6 +8,7 @@ import {
   Text,
   View,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -16,6 +17,7 @@ import Header from '../components/Header';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import BloodRiverBackground from '../components/BloodRiverBackground';
+import { useAuth } from '../context/AuthContext';
 
 const TIPOS_SANGUINEOS = ['O+', 'O−', 'A+', 'A−', 'B+', 'B−', 'AB+', 'AB−'];
 
@@ -78,11 +80,29 @@ function CompatibilityGroup({ title, icon, types, variant, tipo }) {
 
 export default function SangueScreen({ navigation }) {
   const [fontsLoaded] = useFonts({ Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold });
-  const [tipo, setTipo] = useState(null);
-  const [modalVisible, setModalVisible] = useState(true);
+  const { user, updateUser } = useAuth();
+  const [tipo, setTipo] = useState(user?.tipoSanguineo || null);
+  const [modalVisible, setModalVisible] = useState(!user?.tipoSanguineo);
   const compatibility = tipo ? COMPATIBILIDADE[tipo] : null;
 
-  const abrirSeletor = () => setModalVisible(true);
+  React.useEffect(() => {
+    setTipo(user?.tipoSanguineo || null);
+  }, [user?.tipoSanguineo]);
+
+  const abrirSeletor = () => {
+    setTipo(user?.tipoSanguineo || tipo);
+    setModalVisible(true);
+  };
+
+  const salvarTipo = async () => {
+    if (!tipo) return;
+    try {
+      await updateUser({ tipoSanguineo: tipo });
+      setModalVisible(false);
+    } catch {
+      Alert.alert('Não foi possível salvar', 'Confira a conexão com a API e tente novamente.');
+    }
+  };
 
   if (!fontsLoaded) {
     return <View style={styles.loading}><ActivityIndicator size="large" color="#D90808" /></View>;
@@ -205,7 +225,7 @@ export default function SangueScreen({ navigation }) {
             <Button
               variant="primary"
               title="Continuar"
-              onPress={() => tipo && setModalVisible(false)}
+              onPress={salvarTipo}
               disabled={!tipo}
               style={[styles.continueButton, !tipo && styles.continueDisabled]}
               textStyle={styles.continueText}

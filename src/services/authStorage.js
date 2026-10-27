@@ -1,124 +1,77 @@
-/**
- * authStorage.js
- * ---------------------------------------------------------------
- * Camada de persistência LOCAL do app (sem servidor).
- *
- * Usa o AsyncStorage, que guarda pares chave/valor em texto:
- *  - Android/iOS: arquivo no armazenamento interno do app
- *  - Web: localStorage do navegador
- *
- * O que fica salvo:
- *  - USERS_KEY   -> objeto { "email@x.com": { ...dadosDoUsuario } }
- *  - SESSION_KEY -> e-mail do usuário logado (mantém o login ao reabrir o app)
- *
- * A senha NUNCA é salva em texto puro: guardamos um "salt" aleatório
- * e o hash SHA-256 de (salt + senha).
- * Obs.: para um app com servidor de verdade, o ideal é validar a senha
- * no backend (bcrypt/argon2). Aqui é a solução adequada para uso offline.
- */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
+import { api, limparToken, mensagemErroApi, salvarToken } from './api';
 
-const USERS_KEY = '@saudefacil:usuarios';
 const SESSION_KEY = '@saudefacil:sessao';
 
-/** Normaliza o e-mail para que "Ana@x.com " e "ana@x.com" sejam o mesmo usuário. */
-export const normalizarEmail = (email) => String(email || '').trim().toLowerCase();
+function erroDaApi(error) {
+  const code = mensagemErroApi(error);
+  const err = new Error(code === 'ERR_NETWORK' || code === 'ECONNABORTED' ? 'SERVIDOR_INDISPONIVEL' : code);
+  err.code = code;
+  return err;
+}
 
-/** Lê todos os usuários salvos. Se não houver nada (ou o JSON estiver corrompido), devolve {}. */
-async function lerUsuarios() {
+async function concluirAutenticacao(response) {
+  const { user, token } = response.data;
+  await Promise.all([
+    salvarToken(token),
+    AsyncStorage.setItem(SESSION_KEY, JSON.stringify(user)),
+  ]);
+  return user;
+}
+
+export async function cadastrarUsuario(dados) {
   try {
-    const bruto = await AsyncStorage.getItem(USERS_KEY);
-    return bruto ? JSON.parse(bruto) : {};
-  } catch {
-    return {};
+    return await concluirAutenticacao(await api.post('/auth/register', dados));
+  } catch (error) { throw erroDaApi(error); }
+}
+
+export async function autenticar(email, senha) {
+  try {
+    return await concluirAutenticacao(await api.post('/auth/login', { email, senha }));
+  } catch (error) { throw erroDaApi(error); }
+}
+
+export async function carregarSessao() {
+  const cached = await AsyncStorage.getItem(SESSION_KEY);
+  const token = await AsyncStorage.getItem('@saudefacil:token');
+  if (!token) return null;
+  try {
+    const { data } = await api.get('/auth/me');
+    await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+    return data.user;
+  } catch (error) {
+    if (error.response?.status === 401 || error.response?.status === 404) {
+      await encerrarSessao();
+      return null;
+    }
+    // Mantém a sessão visual em caso de indisponibilidade temporária da API.
+    return cached ? JSON.parse(cached) : null;
   }
 }
 
-/** Grava o objeto completo de usuários. */
-async function salvarUsuarios(usuarios) {
-  await AsyncStorage.setItem(USERS_KEY, JSON.stringify(usuarios));
+export async function encerrarSessao() {
+  await Promise.all([limparToken(), AsyncStorage.removeItem(SESSION_KEY)]);
 }
 
-/** Gera um salt aleatório de 16 bytes em hexadecimal. */
-async function gerarSalt() {
-  const bytes = await Crypto.getRandomBytesAsync(16);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+export async function atualizarUsuario(_email, campos) {
+  try {
+    const { data } = await api.patch('/auth/me', campos);
+    await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+    return data.user;
+  } catch (error) { throw erroDaApi(error); }
 }
 
-/** Calcula o hash SHA-256 de salt + senha. */
-const gerarHash = (salt, senha) =>
-  Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, salt + senha);
-
-/** Remove os campos sensíveis antes de entregar o usuário para as telas. */
-function publico(usuario) {
-  const { senhaHash, salt, ...resto } = usuario;
-  return resto;
+export async function salvarRegistroImc(registro) {
+  try { await api.post('/imc', registro); }
+  catch (error) { throw erroDaApi(error); }
 }
 
-/**
- * Cria uma nova conta.
- * Lança Error('EMAIL_EXISTENTE') se o e-mail já estiver cadastrado.
- */
-export async function cadastrarUsuario({ senha, ...dados }) {
-  const email = normalizarEmail(dados.email);
-  const usuarios = await lerUsuarios();
-
-  if (usuarios[email]) throw new Error('EMAIL_EXISTENTE');
-
-  const salt = await gerarSalt();
-  const senhaHash = await gerarHash(salt, senha);
-
-  const novo = { ...dados, email, salt, senhaHash, criadoEm: new Date().toISOString() };
-  usuarios[email] = novo;
-  await salvarUsuarios(usuarios);
-
-  return publico(novo);
+export async function carregarAguaHoje() {
+  try { return (await api.get('/water/today')).data; }
+  catch (error) { throw erroDaApi(error); }
 }
 
-/**
- * Valida e-mail + senha.
- * Lança Error('CREDENCIAIS_INVALIDAS') se algo estiver errado.
- * (Mesma mensagem para "usuário não existe" e "senha errada" de propósito,
- * para não revelar quais e-mails estão cadastrados.)
- */
-export async function autenticar(emailBruto, senha) {
-  const email = normalizarEmail(emailBruto);
-  const usuarios = await lerUsuarios();
-  const usuario = usuarios[email];
-
-  if (!usuario) throw new Error('CREDENCIAIS_INVALIDAS');
-
-  const hash = await gerarHash(usuario.salt, senha);
-  if (hash !== usuario.senhaHash) throw new Error('CREDENCIAIS_INVALIDAS');
-
-  return publico(usuario);
-}
-
-/** Salva quem está logado para manter a sessão após fechar o app. */
-export const iniciarSessao = (email) => AsyncStorage.setItem(SESSION_KEY, normalizarEmail(email));
-
-/** Encerra a sessão (logout). Os dados da conta continuam salvos. */
-export const encerrarSessao = () => AsyncStorage.removeItem(SESSION_KEY);
-
-/** Recupera o usuário da sessão atual, ou null se não houver ninguém logado. */
-export async function carregarSessao() {
-  const email = await AsyncStorage.getItem(SESSION_KEY);
-  if (!email) return null;
-  const usuarios = await lerUsuarios();
-  return usuarios[email] ? publico(usuarios[email]) : null;
-}
-
-/** Atualiza campos do perfil (nome, peso, etc.) sem mexer na senha. */
-export async function atualizarUsuario(emailBruto, campos) {
-  const email = normalizarEmail(emailBruto);
-  const usuarios = await lerUsuarios();
-  if (!usuarios[email]) throw new Error('USUARIO_NAO_ENCONTRADO');
-
-  // Impede que um update sobrescreva dados sensíveis por engano.
-  const { senhaHash, salt, email: _ignorado, ...seguros } = campos;
-  usuarios[email] = { ...usuarios[email], ...seguros };
-  await salvarUsuarios(usuarios);
-
-  return publico(usuarios[email]);
+export async function salvarAguaHoje(registro) {
+  try { await api.put('/water/today', registro); }
+  catch (error) { throw erroDaApi(error); }
 }

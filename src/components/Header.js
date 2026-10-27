@@ -42,7 +42,7 @@ export default function Header({
       <ImageBackground source={require('../../assets/fundoProfileTextura.png')} style={styles.profileBackground}
         imageStyle={styles.profileBackgroundImage} resizeMode="cover">
         <View style={styles.profileTopRow}>
-          <HeaderIconButton icon="log-out-outline" onPress={onLogOut} hitSlop={10} />
+          {onLogOut ? <HeaderIconButton icon="log-out-outline" onPress={onLogOut} hitSlop={10} /> : null}
         </View>
         <View style={styles.profileWave}><WaveDivider color="#F4F1EA" style={styles.wave} /></View>
         <View pointerEvents="none" style={styles.profileWaveEdge} />
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   wave: { width: '100%', height: '100%' },
   profileBackground: { paddingTop: 54, paddingBottom: 46, paddingHorizontal: 20, position: 'relative', overflow: 'hidden', backgroundColor: '#F4F1EA' },
   profileBackgroundImage: { borderBottomLeftRadius: 32, borderBottomRightRadius: 32 },
-  profileTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', zIndex: 5 },
+  profileTopRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', zIndex: 5 },
   profileWave: { position: 'absolute', bottom: -1, left: -1, right: -1, height: 47, zIndex: 2 },
   profileWaveEdge: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, backgroundColor: '#F4F1EA', zIndex: 3 },
 });

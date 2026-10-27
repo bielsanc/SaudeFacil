@@ -1,0 +1,56 @@
+-- Banco do SaudeFacil para MySQL/MariaDB do XAMPP.
+-- Importe este arquivo pelo phpMyAdmin ou execute no console do MySQL.
+
+CREATE DATABASE IF NOT EXISTS saudefacil
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE saudefacil;
+
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(190) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  weight_kg DECIMAL(6,2) NOT NULL,
+  height_cm SMALLINT UNSIGNED NOT NULL,
+  phone VARCHAR(30) NOT NULL,
+  birth_date DATE NOT NULL,
+  blood_type VARCHAR(3) NOT NULL,
+  photo_uri TEXT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_users_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS imc_records (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NOT NULL,
+  age TINYINT UNSIGNED NOT NULL,
+  gender VARCHAR(20) NOT NULL,
+  weight_kg DECIMAL(6,2) NOT NULL,
+  height_cm SMALLINT UNSIGNED NOT NULL,
+  bmi DECIMAL(5,2) NOT NULL,
+  category VARCHAR(40) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_imc_user_date (user_id, created_at),
+  CONSTRAINT fk_imc_user
+    FOREIGN KEY (user_id) REFERENCES users (id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS water_logs (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NOT NULL,
+  log_date DATE NOT NULL,
+  consumed_ml INT UNSIGNED NOT NULL DEFAULT 0,
+  weight_kg DECIMAL(6,2) NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_water_user_date (user_id, log_date),
+  CONSTRAINT fk_water_user
+    FOREIGN KEY (user_id) REFERENCES users (id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

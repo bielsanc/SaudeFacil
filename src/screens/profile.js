@@ -79,7 +79,7 @@ export default function ProfileScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Header variant="profile" onGoBack={() => navigation.goBack()} onLogOut={confirmarSair} />
+        <Header variant="profile" onGoBack={() => navigation.goBack()} />
         <ProfileIdentity
           photoUri={photoUri}
           onChangePhoto={setPhotoUri}

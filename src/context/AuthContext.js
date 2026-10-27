@@ -12,7 +12,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import {
   autenticar, cadastrarUsuario, carregarSessao,
-  iniciarSessao, encerrarSessao, atualizarUsuario,
+  encerrarSessao, atualizarUsuario,
 } from '../services/authStorage';
 
 const AuthContext = createContext(null);
@@ -32,14 +32,12 @@ export function AuthProvider({ children }) {
   /** Login: valida credenciais, grava a sessão e atualiza o estado. */
   const signIn = useCallback(async (email, senha) => {
     const usuario = await autenticar(email, senha);
-    await iniciarSessao(usuario.email);
     setUser(usuario);
   }, []);
 
   /** Cadastro: cria a conta e já entra logado. */
   const signUp = useCallback(async (dados) => {
     const usuario = await cadastrarUsuario(dados);
-    await iniciarSessao(usuario.email);
     setUser(usuario);
   }, []);
 
