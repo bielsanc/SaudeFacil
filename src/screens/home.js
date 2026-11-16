@@ -1,11 +1,13 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator, Text, Image } from 'react-native';
 import { useFonts as usePoppins, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { useFonts as useLibreBaskerville, LibreBaskerville_700Bold } from '@expo-google-fonts/libre-baskerville';
 import Header from '../components/Header';
 import { useAuth } from '../context/AuthContext';
 import CategoryCard from '../components/CategoryCard';
 import BottomNavBar from '../components/BottomNavBar';
+import Card from '../components/Card';
+import { Ionicons } from '@expo/vector-icons';
 
 const categories = [
   { id: '1', title: 'Sangue', icon: require('../../assets/sangue.png') },
@@ -36,6 +38,8 @@ export default function HomeScreen({ navigation }) {
       navigation.navigate('Sangue');
     } else if (title === 'Fruta') {
       navigation.navigate('Fruta');
+    } else if (title === 'UBS próximas') {
+      navigation.navigate('Localizacao');
     } else {
       console.log(`Card ${title} clicado`);
     }
@@ -60,6 +64,15 @@ export default function HomeScreen({ navigation }) {
         />
 
         <View style={styles.gridContainer}>
+          <Card variant="category" onPress={() => handleCardPress('UBS próximas')} style={styles.ubsCard}
+            accessibilityRole="button" accessibilityLabel="Encontrar unidades de saúde próximas">
+            <View style={styles.ubsLogoWrap}><Image source={require('../../assets/susLogo.png')} style={styles.ubsLogo} resizeMode="contain" /></View>
+            <View style={styles.ubsCopy}>
+              <Text style={styles.ubsTitle}>UBS próximas</Text>
+              <Text style={styles.ubsSubtitle}>Encontre uma unidade de saúde perto de você</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#8A8F9E" />
+          </Card>
           <View style={styles.grid}>
             {categories.map((item) => (
               <CategoryCard
@@ -109,5 +122,11 @@ gridContainer: {
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
+  ubsCard: { minHeight: 88, marginBottom: 18, paddingHorizontal: 16, paddingVertical: 12, borderRadius: 20, flexDirection: 'row', alignItems: 'center' },
+  ubsLogoWrap: { width: 58, height: 58, borderRadius: 16, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
+  ubsLogo: { width: 50, height: 50 },
+  ubsCopy: { flex: 1, paddingRight: 8 },
+  ubsTitle: { color: '#262A3B', fontSize: 14, fontFamily: 'Poppins_500Medium' },
+  ubsSubtitle: { color: '#666B78', fontSize: 10, lineHeight: 15, marginTop: 3, fontFamily: 'Poppins_400Regular' },
 });
 

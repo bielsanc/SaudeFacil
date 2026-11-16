@@ -33,6 +33,12 @@
           "photosPermission": "O SaúdeFácil acessa suas fotos para você definir a foto do seu perfil.",
           "cameraPermission": "O SaúdeFácil acessa sua câmera para você tirar uma foto de perfil."
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O SaúdeFácil usa sua localização para encontrar UBS próximas."
+        }
       ]
     ]
   }

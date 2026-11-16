@@ -8,6 +8,7 @@ import AguaScreen from '../screens/agua';
 import ProfileScreen from '../screens/profile';
 import SangueScreen from '../screens/sangue';
 import FruitScreen from '../screens/fruta';
+import LocalizacaoScreen from '../screens/localizacao';
 import LoginScreen from '../screens/login';
 import CadastroScreen from '../screens/cadastro';
 import { useAuth } from '../context/AuthContext';
@@ -39,6 +40,7 @@ export default function AppRouter() {
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Sangue" component={SangueScreen} />
           <Stack.Screen name="Fruta" component={FruitScreen} />
+          <Stack.Screen name="Localizacao" component={LocalizacaoScreen} />
         </>
       ) : (
         <>
