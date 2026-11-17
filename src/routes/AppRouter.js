@@ -9,6 +9,9 @@ import ProfileScreen from '../screens/profile';
 import SangueScreen from '../screens/sangue';
 import FruitScreen from '../screens/fruta';
 import LocalizacaoScreen from '../screens/localizacao';
+import AlergiaScreen from '../screens/alergia';
+import VitalsScreen from '../screens/vitals';
+import NotificationsScreen from '../screens/notificacoes';
 import LoginScreen from '../screens/login';
 import CadastroScreen from '../screens/cadastro';
 import { useAuth } from '../context/AuthContext';
@@ -41,6 +44,10 @@ export default function AppRouter() {
           <Stack.Screen name="Sangue" component={SangueScreen} />
           <Stack.Screen name="Fruta" component={FruitScreen} />
           <Stack.Screen name="Localizacao" component={LocalizacaoScreen} />
+          <Stack.Screen name="Alergia" component={AlergiaScreen} />
+          <Stack.Screen name="Pressao" component={VitalsScreen} initialParams={{ type: 'pressure' }} />
+          <Stack.Screen name="Glicemia" component={VitalsScreen} initialParams={{ type: 'glucose' }} />
+          <Stack.Screen name="Notificacoes" component={NotificationsScreen} />
         </>
       ) : (
         <>

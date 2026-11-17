@@ -5,7 +5,7 @@ import { useFonts as useLibreBaskerville, LibreBaskerville_700Bold } from '@expo
 import Header from '../components/Header';
 import { useAuth } from '../context/AuthContext';
 import CategoryCard from '../components/CategoryCard';
-import BottomNavBar from '../components/BottomNavBar';
+import AppNavigation from '../components/AppNavigation';
 import Card from '../components/Card';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -36,6 +36,12 @@ export default function HomeScreen({ navigation }) {
       navigation.navigate('Agua');
     } else if (title === 'Sangue') {
       navigation.navigate('Sangue');
+    } else if (title === 'Pressão') {
+      navigation.navigate('Pressao');
+    } else if (title === 'Glicemia') {
+      navigation.navigate('Glicemia');
+    } else if (title === 'Alergia') {
+      navigation.navigate('Alergia');
     } else if (title === 'Fruta') {
       navigation.navigate('Fruta');
     } else if (title === 'UBS próximas') {
@@ -86,12 +92,7 @@ export default function HomeScreen({ navigation }) {
         </View>
       </ScrollView>
 
-      <BottomNavBar
-        active="home"
-        onPressHome={() => console.log('Já está na Home')}
-        onPressAdd={() => console.log('Adicionar item')}
-        onPressProfile={() => navigation.navigate('Profile')}
-      />
+      <AppNavigation />
     </SafeAreaView>
   );
 }

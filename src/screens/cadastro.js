@@ -6,8 +6,9 @@
 import React, { useRef, useState } from 'react';
 import {
   View, Text, Image, Pressable, ScrollView, Modal, KeyboardAvoidingView,
-  Platform, ActivityIndicator, StyleSheet,
+  Platform, ActivityIndicator, StyleSheet, TextInput,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { LibreBaskerville_700Bold } from '@expo-google-fonts/libre-baskerville';
 
@@ -25,7 +26,7 @@ export default function CadastroScreen({ navigation }) {
   // Um único objeto guarda todos os campos; "set" atualiza só o campo informado.
   const [form, setForm] = useState({
     nome: '', email: '', peso: '', telefone: '', altura: '',
-    nascimento: '', tipoSanguineo: '', senha: '', confirmar: '',
+    nascimento: '', tipoSanguineo: '', alergias: '', senha: '', confirmar: '',
   });
   const set = (campo) => (valor) => setForm((f) => ({ ...f, [campo]: valor }));
 
@@ -79,6 +80,7 @@ export default function CadastroScreen({ navigation }) {
         telefone: form.telefone,
         nascimento: form.nascimento,
         tipoSanguineo: form.tipoSanguineo,
+        alergias: form.alergias.trim(),
         senha: form.senha,                  // o serviço transforma em hash antes de salvar
       });
       // Sucesso: o AppRouter detecta o "user" e troca para a Home.
@@ -139,6 +141,26 @@ export default function CadastroScreen({ navigation }) {
                 error={erros.tipoSanguineo} onPress={() => setSeletorAberto(true)} />
             </View>
 
+            <View style={styles.allergiesField}>
+              <View style={styles.allergiesLabelRow}>
+                <Ionicons name="medical-outline" size={17} color={NAVY} />
+                <Text style={styles.allergiesLabel}>Alergias conhecidas</Text>
+                <Text style={styles.optionalLabel}>Opcional</Text>
+              </View>
+              <TextInput
+                value={form.alergias}
+                onChangeText={set('alergias')}
+                style={styles.allergiesInput}
+                placeholder="Ex.: dipirona, amendoim, látex..."
+                placeholderTextColor="#85899A"
+                multiline
+                textAlignVertical="top"
+                maxLength={500}
+                autoCapitalize="sentences"
+              />
+              <Text style={styles.allergiesHint}>Informe medicamentos, alimentos ou outras alergias.</Text>
+            </View>
+
             <AuthInput style={styles.full} label="Senha" iconName="lock-closed" placeholder="Digite sua senha" secure
               {...campo('senha', proximo('confirmar'))} />
             <AuthInput style={styles.full} label="Confirmar senha" iconName="lock-closed" placeholder="Confirme sua senha" secure
@@ -196,6 +218,12 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 10, marginTop: 8 },
   half: { flex: 1, minWidth: 0 },
   full: { marginTop: 8 },
+  allergiesField: { marginTop: 14 },
+  allergiesLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 4, marginBottom: 6 },
+  allergiesLabel: { flex: 1, color: NAVY, fontFamily: 'Poppins_700Bold', fontSize: 11 },
+  optionalLabel: { color: '#777D8B', fontFamily: 'Poppins_400Regular', fontSize: 10 },
+  allergiesInput: { minHeight: 78, borderRadius: 16, backgroundColor: '#FFFFFF', paddingHorizontal: 12, paddingVertical: 10, color: NAVY, fontFamily: 'Poppins_400Regular', fontSize: 12, ...Platform.select({ web: { outlineStyle: 'none' } }) },
+  allergiesHint: { marginTop: 4, marginLeft: 7, color: '#737887', fontFamily: 'Poppins_400Regular', fontSize: 9 },
   erroGeral: { fontFamily: 'Poppins_500Medium', fontSize: 12, color: '#D14343', textAlign: 'center', marginTop: 10 },
   btn: { alignSelf: 'center', width: 190, height: 54, borderRadius: 27, paddingVertical: 0, marginTop: 18 },
   btnText: { fontSize: 15, color: '#FFFFFF' },

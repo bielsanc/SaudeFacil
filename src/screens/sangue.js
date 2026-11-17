@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 import Header from '../components/Header';
+import AppNavigation from '../components/AppNavigation';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import BloodRiverBackground from '../components/BloodRiverBackground';
@@ -233,6 +234,7 @@ export default function SangueScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+      <AppNavigation />
     </SafeAreaView>
   );
 }
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   scrollContent: {
-    paddingBottom: 22,
+    paddingBottom: 110,
   },
   hero: {
     minHeight: 168,

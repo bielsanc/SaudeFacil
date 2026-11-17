@@ -1,19 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Image, Linking, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Image, Linking, SafeAreaView, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import axios from 'axios';
+import { api } from '../services/api';
 
 import Header from '../components/Header';
+import AppNavigation from '../components/AppNavigation';
 import FruitSearchInput from '../components/FruitSearchInput';
 
-const FRUIT_API = 'https://www.fruityvice.com/api/fruit';
 const COMMONS_API = 'https://commons.wikimedia.org/w/api.php';
-const FRUIT_API_URL = Platform.OS === 'web'
-  ? (process.env.EXPO_PUBLIC_FRUIT_API_PROXY || 'http://localhost:3001/api/fruit')
-  : FRUIT_API;
-const DEEPL_BATCH_API_URL = process.env.EXPO_PUBLIC_TRANSLATION_API_PROXY
-  || 'http://localhost:3001/api/translate/batch';
 const FRUIT_CATALOG = [
   { apiName: 'Apple', portugueseName: 'Maçã', aliases: ['apple', 'maçã', 'maca'] },
   { apiName: 'Apricot', portugueseName: 'Damasco', aliases: ['apricot', 'damasco'] },
@@ -123,9 +119,7 @@ export default function FruitScreen({ navigation }) {
     try {
       const apiName = knownFruit?.apiName || typedName;
 
-      const response = await axios.get(`${FRUIT_API_URL}/${encodeURIComponent(apiName)}`, {
-        timeout: 12000,
-      });
+      const response = await api.get(`/fruit/${encodeURIComponent(apiName)}`, { timeout: 12000 });
       if (requestId !== latestRequest.current) return;
 
       // A busca é digitada em português; preserve esse nome para evitar traduções
@@ -233,6 +227,7 @@ export default function FruitScreen({ navigation }) {
           </ScrollView>
         </View>
       </View>
+      <AppNavigation />
     </SafeAreaView>
   );
 }
@@ -242,7 +237,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#FFFFFF' },
   layout: { flex: 1, position: 'relative', overflow: 'hidden' },
   foreground: { flex: 1, zIndex: 1 },
-  content: { paddingHorizontal: 22, paddingTop: 18, paddingBottom: 32, alignItems: 'stretch' },
+  content: { paddingHorizontal: 22, paddingTop: 18, paddingBottom: 120, alignItems: 'stretch' },
   backgroundIllustration: {
     position: 'absolute',
     top: 88,
@@ -389,7 +384,7 @@ async function searchFruitImage(fruitName) {
 
 function requestFruitTranslations() {
   if (!fruitTranslationsRequest) {
-    fruitTranslationsRequest = axios.post(DEEPL_BATCH_API_URL, {
+    fruitTranslationsRequest = api.post('/translate/batch', {
       texts: FRUIT_CATALOG.map((fruit) => fruit.englishName || fruit.apiName.replace(/([a-z])([A-Z])/g, '$1 $2')),
     }, { timeout: 15000 })
       .then((response) => {

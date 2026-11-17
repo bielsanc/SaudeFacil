@@ -38,11 +38,16 @@ async function initializeDatabase() {
       phone VARCHAR(30) NOT NULL,
       birth_date DATE NOT NULL,
       blood_type VARCHAR(3) NOT NULL,
+      allergies TEXT NULL,
       photo_uri TEXT NULL,
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
+  const [allergyColumns] = await pool.query("SHOW COLUMNS FROM users LIKE 'allergies'");
+  if (!allergyColumns.length) {
+    await pool.query('ALTER TABLE users ADD COLUMN allergies TEXT NULL');
+  }
   await pool.query(`
     CREATE TABLE IF NOT EXISTS imc_records (
       id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -68,6 +73,34 @@ async function initializeDatabase() {
       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       UNIQUE KEY uq_water_user_date (user_id, log_date),
       CONSTRAINT fk_water_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS pressure_records (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      user_id BIGINT UNSIGNED NOT NULL,
+      systolic SMALLINT UNSIGNED NOT NULL,
+      diastolic SMALLINT UNSIGNED NOT NULL,
+      heart_rate SMALLINT UNSIGNED NULL,
+      context VARCHAR(40) NOT NULL,
+      notes VARCHAR(500) NULL,
+      measured_at DATETIME NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT fk_pressure_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      INDEX idx_pressure_user_date (user_id, measured_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS glucose_records (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      user_id BIGINT UNSIGNED NOT NULL,
+      glucose_mg_dl DECIMAL(7,2) NOT NULL,
+      context VARCHAR(40) NOT NULL,
+      notes VARCHAR(500) NULL,
+      measured_at DATETIME NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT fk_glucose_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      INDEX idx_glucose_user_date (user_id, measured_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
   return pool;

@@ -8,6 +8,7 @@ import {
 } from '@expo-google-fonts/poppins';
 
 import Header from '../components/Header';
+import AppNavigation from '../components/AppNavigation';
 import AguaOndas from '../components/AguaOndas';
 import AguaConsumo from '../components/AguaConsumo';
 import AguaPesoCard from '../components/AguaPesoCard';
@@ -62,6 +63,7 @@ export default function AguaScreen({ navigation }) {
           <AguaQuickAdd onAdicionar={adicionarAgua} />
         </View>
       </View>
+      <AppNavigation />
     </SafeAreaView>
   );
 }
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   bottomContainer: {
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   loading: {
     flex: 1,

@@ -13,7 +13,7 @@ import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_700Bold } from
 import Header from '../components/Header';
 import ProfileIdentity from '../components/ProfileIdentity';
 import ProfileInfoCard from '../components/ProfileInfoCard';
-import BottomNavBar from '../components/BottomNavBar';
+import AppNavigation from '../components/AppNavigation';
 import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { calcularIdade, paraNumero } from '../utils/validacao';
@@ -79,7 +79,7 @@ export default function ProfileScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Header variant="profile" onGoBack={() => navigation.goBack()} />
+        <Header variant="dark" title="Meu perfil" icon={require('../../assets/pessoaIcon.png')} leftIcon="home" onGoBack={() => navigation.navigate('Home')} />
         <ProfileIdentity
           photoUri={photoUri}
           onChangePhoto={setPhotoUri}
@@ -105,12 +105,7 @@ export default function ProfileScreen({ navigation }) {
           iconStyle={styles.buttonIcon} textStyle={styles.logoutText} onPress={confirmarSair} style={styles.logoutBtn} />
       </ScrollView>
 
-      <BottomNavBar
-        active="profile"
-        onPressHome={() => navigation.navigate('Home')}
-        onPressAdd={() => console.log('Adicionar item')}
-        onPressProfile={() => console.log('Já está no Perfil')}
-      />
+      <AppNavigation />
     </SafeAreaView>
   );
 }

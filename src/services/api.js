@@ -1,8 +1,20 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
-// No celular, use no .env o IP local do computador que executa o XAMPP.
-const baseURL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
+const configuredBaseURL = process.env.EXPO_PUBLIC_API_URL;
+
+function getApiBaseURL() {
+  if (Platform.OS === 'web') return configuredBaseURL || 'http://localhost:3000/api';
+
+  const usesLoopback = !configuredBaseURL || /:\/\/(localhost|127\.0\.0\.1)(:\d+)?(?:\/|$)/i.test(configuredBaseURL);
+  const expoHost = Constants.expoConfig?.hostUri?.split(':')[0];
+  if (usesLoopback && expoHost) return `http://${expoHost}:3000/api`;
+  return configuredBaseURL || 'http://localhost:3000/api';
+}
+
+const baseURL = getApiBaseURL();
 const TOKEN_KEY = '@saudefacil:token';
 
 export const api = axios.create({ baseURL, timeout: 10000 });

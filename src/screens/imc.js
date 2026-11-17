@@ -8,6 +8,7 @@ import {
 } from '@expo-google-fonts/poppins';
 
 import Header from '../components/Header';
+import AppNavigation from '../components/AppNavigation';
 import ImcForm from '../components/ImcForm';
 import ImcChart from '../components/ImcImagem';
 import ImcResultCard from '../components/ImcResultado';
@@ -109,6 +110,7 @@ export default function ImcScreen({ navigation }) {
           )}
         </Animated.View>
       </ScrollView>
+      <AppNavigation />
     </SafeAreaView>
   );
 }
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 30,
+    paddingBottom: 110,
   },
   loading: {
     flex: 1,
